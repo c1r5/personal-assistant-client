@@ -12,4 +12,6 @@ dependencies = [
     "google-adk>=1.6.1",
     "pytz>=2025.2",
     "dateparser>=1.2.2",
+    "fastapi[standard]>=0.116.1",
+    "uvicorn>=0.35.0",
 ]

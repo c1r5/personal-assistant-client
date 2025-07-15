@@ -1,4 +1,6 @@
-from google.adk.agents import Agent
+from app.agents.agent import root_agent
+
+
 from google.adk.runners import InMemoryRunner
 from google.genai.types import UserContent
 import logging
@@ -8,9 +10,9 @@ APP_NAME = "Personal Assistant"
 
 logger = logging.getLogger(__name__)
 
-class AssistantClient:
-    def __init__(self, agent: Agent, user_id: str):
-        self.__runner = InMemoryRunner(app_name=APP_NAME, agent=agent)
+class AgentClient:
+    def __init__(self, user_id: str):
+        self.__runner = InMemoryRunner(app_name=APP_NAME, agent=root_agent)
         self.__user_id = user_id
 
     async def start_session(self):
