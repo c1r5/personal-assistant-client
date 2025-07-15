@@ -8,6 +8,8 @@ logger = __import__("logging").getLogger(__name__)
 
 
 class ChatbotService:
+    __ws = None
+
     def __init__(self, ws_url: str):
         self.ws_url = ws_url
 
@@ -15,7 +17,7 @@ class ChatbotService:
         try:
             async with websockets.connect(self.ws_url) as websocket:
                 logger.info(f"Connected to {self.ws_url}")
-                self.ws = websocket
+                self.__ws = websocket
 
                 while True:
                     message = await websocket.recv()
@@ -37,8 +39,8 @@ class ChatbotService:
             logger.error(f"WebSocket connection closed: {e}")
 
     async def close(self):
-        if self.ws:
-            await self.ws.close()
+        if self.__ws:
+            await self.__ws.close()
             logger.info("WebSocket connection closed")
         else:
             logger.warning("WebSocket connection was not established")

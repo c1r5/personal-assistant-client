@@ -16,9 +16,16 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
+def getenv_or_raise(key: str) -> str:
+    value = getenv(key)
+    if not value:
+        raise ValueError(f"{key} environment variable is not set")
+    return value
+
 async def main():
-    chatbot_service_url = getenv("CHAT_SERVICE_URL", "ws://localhost:8000")
-    chatbot_service = ChatbotService(f"{chatbot_service_url}/ws")
+    chatbot_service_url = getenv_or_raise("CHAT_SERVICE_URL")
+
+    chatbot_service = ChatbotService(chatbot_service_url)
     assistant_client = AssistantClient(agent=root_agent, user_id=str(uuid4()))
 
     await assistant_client.start_session()

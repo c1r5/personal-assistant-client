@@ -1,7 +1,6 @@
 services:
-  personal-assistant-mcp-client:
+  personal-assistant-client:
     image: personal-assistant-mcp-client
     build: .
     env_file:
       - ./.env
-    
