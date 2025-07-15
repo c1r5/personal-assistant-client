@@ -31,7 +31,7 @@ class OnMessage:
                 await websocket.send_text("goodbye")
                 await websocket.close()
             case _:
-                await websocket.send_text("unknown")
+                return
 
     async def __is_request(self, message: str) -> bool:
         try:

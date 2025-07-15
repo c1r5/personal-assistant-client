@@ -1,7 +1,7 @@
 import uuid
 
-from app.server.types import APIKeys
-from app.server.types import KeyInfo
+from server.types import APIKeys
+from server.types import KeyInfo
 
 def generate_api_key():
     return str(uuid.uuid4())

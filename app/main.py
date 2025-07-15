@@ -2,11 +2,10 @@ __import__('dotenv').load_dotenv()
 
 from uvicorn import Config, Server
 from fastapi import FastAPI
-
-from app.server.controllers import controller
+from fastapi.middleware.cors import CORSMiddleware
+from server.controllers import controller, on_message, configure_cors
 
 import signal
-from app.server.controllers import on_message
 import asyncio
 import logging
 
@@ -14,13 +13,28 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
+# Configurar CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Em produção, especificar os domínios permitidos
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(controller)
 
 async def on_request_listener(message: str):
-    ...
+    logger.info(f"Received message: {message}")
 
 async def run_fastapi():
-    config = Config("main:app", port=5000, log_level="info")
+    config = Config(
+        app=app,
+        host="0.0.0.0",  # Permitir conexões de qualquer IP
+        port=5000,
+        log_level="info",
+        loop='asyncio'
+    )
     server = Server(config)
     await server.serve()
 
@@ -48,7 +62,7 @@ async def main():
     try:
         await asyncio.gather(fastapi_task)
     except asyncio.CancelledError:
-        logger.info("Tarefas canceladas com sucesso.")
+        logger.info("Tasks cancelled successfully.")
 
 if __name__ == "__main__":
     logging.basicConfig(
