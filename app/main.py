@@ -2,13 +2,22 @@ __import__('dotenv').load_dotenv()
 
 from uvicorn import Config, Server
 from fastapi import FastAPI
+
+from app.server.controllers import controller
+
 import signal
+from app.server.controllers import on_message
 import asyncio
 import logging
 
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+
+app.include_router(controller)
+
+async def on_request_listener(message: str):
+    ...
 
 async def run_fastapi():
     config = Config("main:app", port=5000, log_level="info")
@@ -18,6 +27,8 @@ async def run_fastapi():
 async def main():
     loop = asyncio.get_running_loop()
     stop_event = asyncio.Event()
+
+    on_message.add_listener(on_request_listener)
 
     def shutdown():
         logger.info("Shutting down...")
