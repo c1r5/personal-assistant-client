@@ -2,8 +2,8 @@ import json
 import logging
 
 from google.adk import Agent
-from app.agents.config import AgentModel, Configs
-from app.agents.tools.mcp_loader import load_mcp_servers
+from agents.config import AgentModel, Configs
+from agents.tools.mcp_loader import load_mcp_servers
 
 logger = logging.getLogger(__name__ + ".notes-agent")
 configs = Configs(agent_settings=AgentModel(name="NotesAgent"))

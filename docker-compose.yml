@@ -1,6 +1,8 @@
 services:
-  personal-assistant-client:
-    image: personal-assistant-mcp-client
+  personal-assistant-agent:
+    image: personal-assistant-agent
     build: .
     env_file:
       - ./.env
+    ports:
+      - 5000:5000

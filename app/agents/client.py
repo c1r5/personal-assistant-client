@@ -1,5 +1,5 @@
 from google.adk.sessions.session import Session
-from app.agents.agent import root_agent
+from agents.agent import root_agent
 
 
 from google.adk.runners import InMemoryRunner

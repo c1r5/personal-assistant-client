@@ -1,9 +1,9 @@
 from google.adk import Agent
 from google.genai import types
 
-from app.agents.config import Configs
-from app.agents.sub_agents.notes_agent import notes_agent
-from app.agents.sub_agents.basic_agents import (
+from agents.config import Configs
+from agents.sub_agents.notes_agent import notes_agent
+from agents.sub_agents.basic_agents import (
     current_datetime_agent,
     weather_agent,
 )

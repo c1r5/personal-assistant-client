@@ -1,8 +1,11 @@
 __import__('dotenv').load_dotenv()
 
+from pydantic import ValidationError
 from uvicorn import Config, Server
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from models import ClientMessage
 from session.repository import SessionEvent
 from server.controllers import controller, session_repository
 from agents.client import AgentClient
@@ -26,28 +29,50 @@ app.add_middleware(
 
 app.include_router(controller)
 
+async def on_session_message(message: str, session_id: str):
+    logger.info(f"Received message: {message}")
+
+    session = await session_repository.get_session(session_id)
+
+    if session is None:
+        logger.error(f"Session not found: {session_id}")
+        return
+
+    try:
+        client_message = ClientMessage.model_validate_json(message)
+        async for agent_response in agent.request(session_id, client_message.content):
+
+            client_response = ClientMessage(
+                content=agent_response.strip(),
+                connector=client_message.connector
+            )
+
+            await session.send_message(client_response.model_dump_json())
+
+    except ValidationError as e:
+        logger.error(f"Invalid message: {message}", exc_info=e)
+        return
+
 async def on_create_session(session_id: str):
-    await agent.create_session(session_id)
+    session = await session_repository.get_session(session_id)
+
+    if session is None:
+        logger.error(f"Session not found: {session_id}")
+        return
+
+    session.add_on_message_listener(on_session_message)
 
 async def on_delete_session(session_id: str):
     await agent.delete_session(session_id)
 
-async def on_session_message(session_id: str, message: str):
-    ...
-    # async for response in agent.request(session_id, message):
-    #     logger.info(f"Agent response: {response}")
-
-async def on_request_listener(event: SessionEvent):
+async def session_event_listener(event: SessionEvent):
     match event.type:
-        case "message":
-            if event.data is not None:
-                await on_session_message(event.session_id, event.data)
         case "created":
-            logger.info(f"Session created: {event.session_id}")
+            await on_create_session(event.session_id)
             await agent.create_session(event.session_id)
+
         case "deleted":
-            logger.info(f"Session deleted: {event.session_id}")
-            await agent.delete_session(event.session_id)
+            await on_delete_session(event.session_id)
         case _:
             logger.warning(f"Unknown event type: {event.type}")
 
@@ -56,7 +81,7 @@ async def main():
     stop_event = asyncio.Event()
     server = None
 
-    session_repository.add_session_event_listener(on_request_listener)
+    session_repository.add_listener(session_event_listener)
 
     async def shutdown():
         logger.info("Shutting down...")
@@ -73,8 +98,7 @@ async def main():
         host="0.0.0.0",
         port=5000,
         log_level="info",
-        loop='asyncio',
-        reload=True
+        loop='asyncio'
     )
     server = Server(config)
     server_task = asyncio.create_task(server.serve())

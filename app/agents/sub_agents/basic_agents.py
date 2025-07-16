@@ -1,9 +1,9 @@
 from google.adk import Agent
 
-from app.agents.config import AgentModel, Configs
-from app.agents.tools.get_weather_tool import get_weather
+from agents.config import AgentModel, Configs
+from agents.tools.get_weather_tool import get_weather
 
-from app.agents.tools.get_current_time import (
+from agents.tools.get_current_time import (
     calculate_future_date,
     get_current_time,
     parse_date_query,

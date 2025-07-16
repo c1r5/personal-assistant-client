@@ -22,11 +22,16 @@ async def websocket_handler(websocket: WebSocket, api_key: str):
 
         await websocket.accept()
 
-        session = await session_repository.get_or_create_session(api_key)
+        session = await session_repository.create_session(api_key)
+
+        async def on_reply_listener(data):
+            await websocket.send_text(data)
+
+        session.add_on_reply_listener(on_reply_listener)
 
         while True:
             data = await websocket.receive_text()
-            await session_repository.on_message(data, session)
+            await session.on_message(data)
 
 
     except Exception as e:
