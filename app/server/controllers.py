@@ -1,29 +1,38 @@
 from fastapi.routing import APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-from server.handlers import OnMessage
 from fastapi import WebSocket
 from fastapi import FastAPI
+
 import logging
 
-logger = logging.getLogger(__name__)
-controller = APIRouter()
-on_message = OnMessage()
+from server.security import key_exists
+from session.repository import SessionRepository
 
-@controller.websocket("/ws")
-async def websocket_handler(websocket: WebSocket):
+logger = logging.getLogger(__name__)
+
+controller = APIRouter()
+session_repository = SessionRepository()
+
+@controller.websocket("/ws/{api_key}")
+async def websocket_handler(websocket: WebSocket, api_key: str):
     try:
+        if not key_exists(api_key):
+            await websocket.close(403)
+            return
+
         await websocket.accept()
 
+        session = await session_repository.get_or_create_session(api_key)
+
         while True:
-            await on_message.on_recv(websocket)
+            data = await websocket.receive_text()
+            await session_repository.on_message(data, session)
+
 
     except Exception as e:
-        logger.error(f"WebSocket error: {e}")
+        logger.error(f"Error in websocket_handler: {e}")
     finally:
-        try:
-            await websocket.close()
-        except Exception as e:
-            logger.error(f"Error closing websocket: {e}")
+        await websocket.close()
 
 def configure_cors(app: FastAPI):
     app.add_middleware(

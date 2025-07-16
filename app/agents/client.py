@@ -1,3 +1,4 @@
+from google.adk.sessions.session import Session
 from app.agents.agent import root_agent
 
 
@@ -11,22 +12,31 @@ APP_NAME = "Personal Assistant"
 logger = logging.getLogger(__name__)
 
 class AgentClient:
-    def __init__(self, user_id: str):
+    __sessions: dict[str, Session] = {}
+
+    def __init__(self):
         self.__runner = InMemoryRunner(app_name=APP_NAME, agent=root_agent)
-        self.__user_id = user_id
 
-    async def start_session(self):
+    async def create_session(self, user_id: str):
         logger.info("Starting session")
-        self.session = await self.__runner.session_service.create_session(app_name=APP_NAME, user_id=self.__user_id)
+        session = await self.__runner.session_service.create_session(app_name=APP_NAME, user_id=user_id)
+        self.__sessions[user_id] = session
+        return session
 
-    async def stop_session(self):
+    async def delete_session(self, user_id: str):
         logger.info("Stopping session")
-        await self.__runner.session_service.delete_session(app_name=APP_NAME, session_id=self.session.id, user_id=self.__user_id)
+        await self.__runner.session_service.delete_session(app_name=APP_NAME, session_id=self.__sessions[user_id].id, user_id=user_id)
 
-    async def request(self, message: str):
+    async def request(self, user_id: str, message: str):
+        session = self.__sessions.get(user_id)
+
+        if not session:
+            logger.warning("Session not started")
+            return
+
         try:
             logger.info("Requesting response")
-            async for response in self.__runner.run_async(user_id=self.__user_id, session_id=self.session.id, new_message=UserContent(message)):
+            async for response in self.__runner.run_async(user_id=user_id, session_id=session.id, new_message=UserContent(message)):
                 if not response.is_final_response():
                     continue
 
