@@ -5,11 +5,7 @@ services:
       - ./.env
     develop:
       watch:
-        - path: ./assistant_agent/
-          action: rebuild
-        - path: ./chatbot/
-          action: rebuild
-        - path: ./main.py
+        - path: ./app/
           action: rebuild
         - path: ./docker-compose.yml
           action: rebuild
