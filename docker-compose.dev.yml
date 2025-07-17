@@ -1,5 +1,5 @@
 services:
-  personal-assistant-mcp-client:
+  personal-assistant-agent:
     build: .
     env_file:
       - ./.env

@@ -11,7 +11,7 @@ COPY ./api_keys.json /app/
 COPY ./uv.lock /app/
 COPY ./pyproject.toml /app/
 
-EXPOSE 5000
+EXPOSE 8000
 
 RUN uv sync --locked
 

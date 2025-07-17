@@ -93,7 +93,7 @@ async def main():
     config = Config(
         app=app,
         host="0.0.0.0",
-        port=5000,
+        port=8000,
         log_level="info",
         loop='asyncio'
     )
@@ -119,7 +119,9 @@ async def main():
 if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO,
-        format="%(asctime)s - %(levelname)s - %(message)s"
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        filename="app.log",
+        filemode='w'
     )
 
     try:

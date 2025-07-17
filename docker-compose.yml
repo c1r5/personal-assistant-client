@@ -1,8 +1,9 @@
 services:
   personal-assistant-agent:
     image: personal-assistant-agent
+    container_name: agent
     build: .
     env_file:
       - ./.env
     ports:
-      - 5000:5000
+      - 8000:8000
