@@ -2,7 +2,7 @@ from google.adk import Agent
 from google.genai import types
 
 from agents.config import Configs
-from agents.sub_agents.notes_agent import notes_agent
+from agents.sub_agents.mcp_agents import notes_mcp_agent
 from agents.sub_agents.basic_agents import (
     current_datetime_agent,
     weather_agent,
@@ -15,7 +15,7 @@ configs = Configs()
 root_agent = Agent(
     name=configs.agent_settings.name,
     model=configs.agent_settings.model,
-    sub_agents=[current_datetime_agent, notes_agent, weather_agent],
+    sub_agents=[current_datetime_agent, notes_mcp_agent, weather_agent],
     generate_content_config=gen_config,
     instruction="""
         You are a helpful assistant thats orchestrates sub assistant.

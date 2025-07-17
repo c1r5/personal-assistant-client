@@ -1,3 +1,5 @@
+from typing_extensions import Optional
+from google.adk.agents.run_config import RunConfig
 from google.adk.sessions.session import Session
 from agents.agent import root_agent
 
@@ -36,6 +38,7 @@ class AgentClient:
 
         try:
             logger.info("Requesting response")
+
             async for response in self.__runner.run_async(user_id=user_id, session_id=session.id, new_message=UserContent(message)):
                 if not response.is_final_response():
                     continue

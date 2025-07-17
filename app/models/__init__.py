@@ -1,5 +1,9 @@
+from typing import Optional
 from pydantic.main import BaseModel
 
-class ClientMessage(BaseModel):
+class ConnectorRequest(BaseModel):
     content: str
-    connector: str
+    connector: Optional[str] = None
+
+class AgentResponse(BaseModel):
+    content: str

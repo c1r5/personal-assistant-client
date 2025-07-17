@@ -5,8 +5,8 @@ from google.adk import Agent
 from agents.config import AgentModel, Configs
 from agents.tools.mcp_loader import load_mcp_servers
 
-logger = logging.getLogger(__name__ + ".notes-agent")
-configs = Configs(agent_settings=AgentModel(name="NotesAgent"))
+logger = logging.getLogger(__name__)
+configs = Configs(agent_settings=AgentModel(name="McpAgents"))
 
 try:
     with open("mcp.json", "r") as f:
@@ -17,7 +17,7 @@ except Exception as e:
     mcp_tools = []
     logger.error("Erro ao obter ferramentas do arquivo: ", exc_info=e)
 
-notes_agent = Agent(
+notes_mcp_agent = Agent(
     model=configs.agent_settings.model,
     name=configs.agent_settings.name,
     description="Um agente para criar, buscar e gerenciar anotações em diversas plataformas.",

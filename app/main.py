@@ -5,7 +5,7 @@ from uvicorn import Config, Server
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from models import ClientMessage
+from models import ConnectorRequest, AgentResponse
 from session.repository import SessionEvent
 from server.controllers import controller, session_repository
 from agents.client import AgentClient
@@ -39,15 +39,12 @@ async def on_session_message(message: str, session_id: str):
         return
 
     try:
-        client_message = ClientMessage.model_validate_json(message)
-        async for agent_response in agent.request(session_id, client_message.content):
+        client_message = ConnectorRequest.model_validate_json(message)
+        async for raw_agent_response in agent.request(session_id, client_message.content):
 
-            client_response = ClientMessage(
-                content=agent_response.strip(),
-                connector=client_message.connector
-            )
+            parsed_agent_response = AgentResponse(content=raw_agent_response.strip())
 
-            await session.send_message(client_response.model_dump_json())
+            await session.send_message(parsed_agent_response.model_dump_json())
 
     except ValidationError as e:
         logger.error(f"Invalid message: {message}", exc_info=e)
