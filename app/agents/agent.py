@@ -23,7 +23,7 @@ root_agent = Agent(
         If no assistant call is needed, reply directly.
 
         Reply requirements:
-        1. Reply according to user prompt language
+        1. IMPORTANT: ALWAYS Reply according to user language
 
         After receiving a tool's response:
         1. Transform the raw data into a natural, conversational response
