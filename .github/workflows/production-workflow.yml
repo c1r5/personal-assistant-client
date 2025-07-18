@@ -17,6 +17,11 @@ jobs:
       - name: 📥 Checkout do código
         uses: actions/checkout@v4
 
+      - name: 🧪 Rodar testes
+        run: |
+          python -m pip install -e .[test]
+          pytest -q
+
       - name: 📦 Sincronizar arquivos com a VPS (via rsync)
         run: |
           rsync -avz --exclude-from='.rsync-exclude' ./ \

@@ -2,6 +2,7 @@ __import__('dotenv').load_dotenv()
 
 from pydantic import ValidationError
 from uvicorn import Config, Server
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -18,6 +19,9 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 agent = AgentClient()
+# Porta do servico
+def get_service_port() -> int:
+    return int(os.getenv("SERVICE_PORT", "8000"))
 # Configurar CORS
 app.add_middleware(
     CORSMiddleware,
@@ -93,7 +97,7 @@ async def main():
     config = Config(
         app=app,
         host="0.0.0.0",
-        port=8000,
+        port=get_service_port(),
         log_level="info",
         loop='asyncio'
     )
