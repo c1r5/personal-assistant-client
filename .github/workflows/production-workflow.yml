@@ -18,11 +18,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: 🛠️ Instalar uv
-        run: python -m pip install uv
+        run: python3 -m pip install uv
 
       - name: 🧪 Rodar testes
         run: |
-          uv pip install -e .[test]
+          uv sync --locked
           uv run -m pytest -q
 
       - name: 📦 Sincronizar arquivos com a VPS (via rsync)
