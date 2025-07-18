@@ -24,6 +24,9 @@ class ClientSession:
     def add_on_reply_listener(self, callback: Callable[[Data], Awaitable[None]]):
         self.__on_reply = callback
 
+    def remove_on_reply_listener(self):
+        self.__on_reply = None
+
     def add_on_message_listener(self, callback: Callable[[str, SessionID], Awaitable[None]]):
         self.__on_message = callback
 
