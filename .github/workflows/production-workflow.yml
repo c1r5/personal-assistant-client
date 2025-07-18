@@ -19,7 +19,7 @@ jobs:
 
       - name: 🧪 Rodar testes
         run: |
-          python -m pip install -e .[test]
+          python3 -m pip install -e .[test]
           pytest -q
 
       - name: 📦 Sincronizar arquivos com a VPS (via rsync)
