@@ -17,10 +17,13 @@ jobs:
       - name: 📥 Checkout do código
         uses: actions/checkout@v4
 
+      - name: 🛠️ Instalar uv
+        run: python3 -m pip install uv
+
       - name: 🧪 Rodar testes
         run: |
-          python3 -m pip install -e .[test]
-          pytest -q
+          uv sync --locked
+          uv run -m pytest -q
 
       - name: 📦 Sincronizar arquivos com a VPS (via rsync)
         run: |
