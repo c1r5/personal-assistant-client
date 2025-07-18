@@ -1,6 +1,7 @@
 from fastapi.routing import APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import WebSocket
+from fastapi import WebSocket, WebSocketDisconnect
+from starlette.websockets import WebSocketState
 from fastapi import FastAPI
 
 import logging
@@ -15,6 +16,7 @@ session_repository = SessionRepository()
 
 @controller.websocket("/ws/{api_key}")
 async def websocket_handler(websocket: WebSocket, api_key: str):
+    session = None
     try:
         if not key_exists(api_key):
             await websocket.close(403)
@@ -33,11 +35,16 @@ async def websocket_handler(websocket: WebSocket, api_key: str):
             data = await websocket.receive_text()
             await session.on_message(data)
 
-
+    except WebSocketDisconnect:
+        logger.info("WebSocket client disconnected")
     except Exception as e:
         logger.error(f"Error in websocket_handler: {e}")
     finally:
-        await websocket.close()
+        if session:
+            session.remove_on_reply_listener()
+            await session_repository.delete_session(api_key)
+        if websocket.application_state == WebSocketState.CONNECTED:
+            await websocket.close()
 
 def configure_cors(app: FastAPI):
     app.add_middleware(
